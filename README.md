@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Public Welfare Service Assistant Frontend
 
 React + TypeScript single-page application delivering the public welfare guidance experience. The UI focuses on a chatbot-first flow, life-event navigation, and accessibility tooling tailored for civic services.
@@ -42,10 +41,12 @@ frontend/
 ## Core User Journeys
 
 1. **Chatbot-Guided Complaint Preparation**
+
    - `HomePage` renders chatbot input and response components.
    - Queries are matched via search helpers and return online/offline steps plus a document checklist.
 
 2. **Life-Event Navigation**
+
    - `CategoryGrid` displays cards for senior support, childcare, and disability programs.
    - `ServiceSummaryCard` links to `ServiceDetailPage`, mirroring chatbot guidance.
 
@@ -70,6 +71,3 @@ frontend/
 - Static guidance data is seeded in `src/data/serviceGuidance.ts` while the `/api/civil-petitions` endpoint is served by the Spring Boot backend.
 - Audio summary uses the Web Speech API and fails silently in unsupported environments.
 - Engine requirements: Node.js >= 18 (tested with Vite 5, React 18).
-=======
-# real_project_cloud_bridge
->>>>>>> 6da18fad532c601335d03e566c1db5e10b448aaa
