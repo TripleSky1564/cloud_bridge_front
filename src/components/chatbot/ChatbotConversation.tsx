@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import styles from './ChatbotConversation.module.css'
 import mascotFace from '../../img/logo_face.png'
 
@@ -49,7 +49,11 @@ const renderAssistantContent = (() => {
   return (content: string) => {
     if (!content || content.trim().length === 0) {
       keySeed += 1
-      return <p className={styles.body} key={`paragraph-${keySeed}`}>&nbsp;</p>
+      return (
+        <p className={styles.body} key={`paragraph-${keySeed}`}>
+          &nbsp;
+        </p>
+      )
     }
 
     const nodes: ReactNode[] = []
@@ -124,11 +128,17 @@ export const ChatbotConversation = ({
   isStreaming = false,
   onReset,
 }: ChatbotConversationProps) => {
+  const scrollAnchorRef = useRef<HTMLDivElement | null>(null)
   const safeMessages = messages.filter(
     (message): message is ChatMessage =>
       Boolean(message) && (message.sender === 'user' || message.sender === 'assistant'),
   )
   const hasMessages = safeMessages.length > 0
+
+  useEffect(() => {
+    if (!scrollAnchorRef.current) return
+    scrollAnchorRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' })
+  }, [messages, isStreaming])
 
   return (
     <div className={styles.chat} role="log" aria-live="polite">
@@ -138,7 +148,9 @@ export const ChatbotConversation = ({
             message.sender === 'assistant' ? (
               <AssistantBubble key={message.id} tone={message.tone}>
                 {renderAssistantContent(message.content || '')}
-                {message.isStreaming ? <span className={styles.typing}>답변 작성 중…</span> : null}
+                {message.isStreaming ? (
+                  <span className={styles.typing}>답변 작성 중…</span>
+                ) : null}
               </AssistantBubble>
             ) : (
               <UserBubble key={message.id}>
@@ -160,6 +172,7 @@ export const ChatbotConversation = ({
             <p className={styles.body}>답변을 불러오는 중입니다…</p>
           </AssistantBubble>
         ) : null}
+        <div ref={scrollAnchorRef} aria-hidden="true" />
       </div>
 
       {hasMessages ? (
