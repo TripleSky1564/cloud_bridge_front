@@ -2,7 +2,7 @@
   <img src="https://github.com/user-attachments/assets/4a6a621f-8a20-4ed1-af88-a0a51ca221aa" width="900">
 </p>
 
-# 🌤️ CloudBridge – RAG 기반 통합 민원 AI 지원 서비스  
+# 🌤️ Cloud__Bridge – RAG 기반 통합 민원 AI 지원 서비스  
 **민원 검색 · 체크리스트 · 위치 정보 · AI 챗봇 상담을 통합 제공하는 All-in-One 플랫폼**
 
 <img src="https://img.shields.io/badge/NaverCloudPlatform-VPC-green" />
@@ -94,11 +94,11 @@ CloudBridge는 복잡한 민원 정보를 누구나 빠르게 이해하고 처�
 - LangChain, OpenAI GPT-4o-mini
 - OpenSearch (Vector Search)
 - Redis (Session Cache)
-- MySQL 8
+- MySQL
 
 ### Frontend
 - React + TypeScript
-- Axios, Zustand
+- Axios
 - Nginx Reverse Proxy
 
 ### Infra (Naver Cloud Platform)
@@ -110,12 +110,7 @@ CloudBridge는 복잡한 민원 정보를 누구나 빠르게 이해하고 처�
 
 ## 📁 프로젝트 구조
 
-/frontend # React + TypeScript
-/backend-was # Spring Boot WAS
-/chatbot-api # FastAPI + LangChain
-/text-embedding-api
-/file-api # 문서 텍스트 제공 서버
-/opensearch # OpenSearch 구성 파일
+![Image](https://github.com/user-attachments/assets/8d429243-218d-4534-936f-20a884c36e01)
 
 ---
 
@@ -136,19 +131,6 @@ CloudBridge는 복잡한 민원 정보를 누구나 빠르게 이해하고 처�
 - 해결: vector_field, text_field 일치하도록 수정
 
 ---
-
-## 🧑‍💻 실행 방법
-
-### 1) Docker Compose 실행
-```bash
-docker-compose up -d
-2) Health Check
-bash
-코드 복사
-curl http://localhost:9500/health
-curl http://localhost:8081/health
-🧾 라이선스
-MIT License
 
 👥 팀 / 기여자
 PM / Infra: 양용석
