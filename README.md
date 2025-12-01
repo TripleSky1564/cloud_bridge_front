@@ -49,7 +49,7 @@ CloudBridge는 복잡한 민원 정보를 누구나 빠르게 이해하고 처�
 
 ## 🏛 전체 시스템 아키텍처 (Naver Cloud Platform)
 
-<p align="center">
+<p>
   <img src="https://github.com/TripleSky1564/cloud_bridge_front/issues/1#issue-3679563108" width="900">
 </p>
 
