@@ -133,6 +133,7 @@ CloudBridge는 복잡한 민원 정보를 누구나 빠르게 이해하고 처�
 ---
 
 👥 팀 / 기여자
+
 PM / Infra: 양용석
 
 AI Chatbot(FastAPI): 양용석
