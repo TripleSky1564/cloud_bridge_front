@@ -63,7 +63,7 @@ CloudBridge는 복잡한 민원 정보를 누구나 빠르게 이해하고 처�
 
 ## 🧠 RAG 파이프라인 구조
 
-> ![Image](https://github.com/TripleSky1564/cloud_bridge_front/issues/2#issue-3679612801)
+> ![Image](https://github.com/user-attachments/assets/ac1e76b4-16f4-4bc5-b085-3916eb0393fd)
 
 ## 🔐 보안 및 개인정보 처리
 
@@ -81,17 +81,7 @@ CloudBridge는 복잡한 민원 정보를 누구나 빠르게 이해하고 처�
 
 ## 🗄 문서 인덱싱 파이프라인(Embedding)
 
-문서 수집
-↓
-전처리(불필요 텍스트 제거)
-↓
-문단 분리
-↓
-Embedding API 호출
-↓
-OpenSearch 저장(원문 + 벡터)
-
-RAG 품질을 유지하기 위해 자동화 스크립트 제공.
+문서 수집 → 전처리(불필요 텍스트 제거) → 문단 분리 → Embedding API 호출 → OpenSearch 저장(원문 + 벡터) → RAG 품질을 유지하기 위해 자동화 스크립트 제공.
 
 ---
 
@@ -125,9 +115,6 @@ RAG 품질을 유지하기 위해 자동화 스크립트 제공.
 /text-embedding-api
 /file-api # 문서 텍스트 제공 서버
 /opensearch # OpenSearch 구성 파일
-
-yaml
-코드 복사
 
 ---
 
@@ -165,8 +152,12 @@ MIT License
 👥 팀 / 기여자
 PM / Infra: 양용석
 
-Backend(WAS): OOO
+AI Chatbot(FastAPI): 양용석
 
-AI Chatbot(FastAPI): OOO
+Backend(WAS): 이동민
 
-Frontend: OOO
+Frontend: 오정관
+
+data collection : 배종민
+
+deliverable: 김윤수
