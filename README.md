@@ -49,27 +49,8 @@ CloudBridge는 복잡한 민원 정보를 누구나 빠르게 이해하고 처�
 
 ## 🏛 전체 시스템 아키텍처 (Naver Cloud Platform)
 
-<p>
-  <img src="https://github.com/TripleSky1564/cloud_bridge_front/issues/1#issue-3679563108" width="900">
-</p>
+> ![Image](https://github.com/user-attachments/assets/b0ae11e9-e234-4c72-afdc-06eb6d6ae58d)
 
-사용자
-│
-▼
-Nginx(SSL)
-│ Reverse Proxy
-▼
-ALB(HTTPS Termination)
-├── Web Server (Spring Boot)
-└── Chatbot Server (FastAPI)
-
-[Private Subnet]
-├── OpenSearch (Vector DB)
-├── Redis (Session Cache)
-└── MySQL (User & 민원 DB)
-
-yaml
-코드 복사
 
 ### 설계 원칙
 - Public Subnet: 프론트, 웹서버, 챗봇 서버
@@ -92,11 +73,6 @@ yaml
 ├─▶ 관련 텍스트 로드(File API)
 ├─▶ LangChain Prompt 구성
 └─▶ FastAPI Streaming 응답
-
-yaml
-코드 복사
-
----
 
 ## 🔐 보안 및 개인정보 처리
 
@@ -123,9 +99,6 @@ yaml
 Embedding API 호출
 ↓
 OpenSearch 저장(원문 + 벡터)
-
-yaml
-코드 복사
 
 RAG 품질을 유지하기 위해 자동화 스크립트 제공.
 
