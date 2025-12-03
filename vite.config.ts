@@ -39,11 +39,16 @@ export default defineConfig({
   base: '/',
   server: {
     // Ensure the dev server always opens the root page
+    host: '0.0.0.0',
     open: '/',
     // Use a fixed port; if occupied, fail instead of switching silently
     port: 5180,
     strictPort: true,
     proxy: buildProxyConfig(),
+
+    hmr: {
+      overlay: false,
+    },
   },
   preview: {
     port: 4180,
