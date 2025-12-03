@@ -1,133 +1,147 @@
-import { type FormEvent, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import styles from './AuthPage.module.css'
-import { useAuth } from '../../context/useAuth'
-import { isValidPhoneNumber, normalizePhoneNumber } from '../../utils/phoneVerification'
-import { postJson } from '../../utils/api'
+import { type FormEvent, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import styles from "./AuthPage.module.css";
+import { useAuth } from "../../context/useAuth";
+import {
+  isValidPhoneNumber,
+  normalizePhoneNumber,
+} from "../../utils/phoneVerification";
+import { postJson } from "../../utils/api";
 
-type Alert = { type: 'success' | 'error'; text: string }
+type Alert = { type: "success" | "error"; text: string };
 
 export const SignupPage = () => {
-  const navigate = useNavigate()
-  const { register } = useAuth()
+  const navigate = useNavigate();
+  const { register } = useAuth();
 
-  const [name, setName] = useState('')
-  const [phone, setPhone] = useState('')
-  const [inputCode, setInputCode] = useState('')
-  const [issuedCode, setIssuedCode] = useState<string | null>(null)
-  const [verified, setVerified] = useState(false)
-  const [alert, setAlert] = useState<Alert | null>(null)
-  const [isSubmitting, setSubmitting] = useState(false)
-  const [isRequestingCode, setRequestingCode] = useState(false)
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [inputCode, setInputCode] = useState("");
+  const [issuedCode, setIssuedCode] = useState<string | null>(null);
+  const [verified, setVerified] = useState(false);
+  const [alert, setAlert] = useState<Alert | null>(null);
+  const [isSubmitting, setSubmitting] = useState(false);
+  const [isRequestingCode, setRequestingCode] = useState(false);
 
   // 회원가입을 새로 시작하면 기존 인증 상태는 초기화합니다.
   const resetVerificationState = () => {
-    setInputCode('')
-    setIssuedCode(null)
-    setVerified(false)
-  }
+    setInputCode("");
+    setIssuedCode(null);
+    setVerified(false);
+  };
 
   const handleSendCode = async () => {
-    const normalizedPhone = normalizePhoneNumber(phone)
+    const normalizedPhone = normalizePhoneNumber(phone);
     if (!name.trim()) {
-      setAlert({ type: 'error', text: '이름을 먼저 입력해주세요.' })
-      return
+      setAlert({ type: "error", text: "이름을 먼저 입력해주세요." });
+      return;
     }
     if (!isValidPhoneNumber(normalizedPhone)) {
-      setAlert({ type: 'error', text: '휴대전화 번호를 정확히 입력해주세요.' })
-      return
+      setAlert({ type: "error", text: "휴대전화 번호를 정확히 입력해주세요." });
+      return;
     }
 
     try {
-      setRequestingCode(true)
+      setRequestingCode(true);
       // 백엔드(Spring Boot)에서 실제 문자 발송과 코드 저장을 담당합니다.
       const response = await postJson<{ message: string; demoCode?: string }>(
-        '/api/auth/phone/request',
-        { name: name.trim(), phone: normalizedPhone },
-      )
-      setIssuedCode('requested') // 코드 값 대신 요청만 했다는 상태를 저장합니다.
-      setInputCode('')
-      setVerified(false)
+        "/auth/phone/request",
+        { name: name.trim(), phone: normalizedPhone }
+      );
+      setIssuedCode("requested"); // 코드 값 대신 요청만 했다는 상태를 저장합니다.
+      setInputCode("");
+      setVerified(false);
       setAlert({
-        type: 'success',
+        type: "success",
         text: `${response.message}${
-          response.demoCode ? ` (시연용 코드: ${response.demoCode})` : ''
+          response.demoCode ? ` (시연용 코드: ${response.demoCode})` : ""
         }`,
-      })
+      });
     } catch (error) {
-      const message = error instanceof Error ? error.message : '인증번호 발송에 실패했습니다.'
-      setAlert({ type: 'error', text: message })
+      const message =
+        error instanceof Error
+          ? error.message
+          : "인증번호 발송에 실패했습니다.";
+      setAlert({ type: "error", text: message });
     } finally {
-      setRequestingCode(false)
+      setRequestingCode(false);
     }
-  }
+  };
 
   const handleVerifyCode = async () => {
     if (!issuedCode) {
-      setAlert({ type: 'error', text: '먼저 인증번호를 발송해주세요.' })
-      return
+      setAlert({ type: "error", text: "먼저 인증번호를 발송해주세요." });
+      return;
     }
 
     try {
-      const normalizedPhone = normalizePhoneNumber(phone)
-      await postJson<{ message: string }>('/api/auth/phone/verify', {
+      const normalizedPhone = normalizePhoneNumber(phone);
+      await postJson<{ message: string }>("/auth/phone/verify", {
         phone: normalizedPhone,
         code: inputCode.trim(),
-      })
-      setVerified(true)
-      setAlert({ type: 'success', text: '휴대전화 인증이 완료되었습니다.' })
+      });
+      setVerified(true);
+      setAlert({ type: "success", text: "휴대전화 인증이 완료되었습니다." });
     } catch (error) {
-      const message = error instanceof Error ? error.message : '인증번호가 일치하지 않습니다.'
-      setVerified(false)
-      setAlert({ type: 'error', text: message })
+      const message =
+        error instanceof Error
+          ? error.message
+          : "인증번호가 일치하지 않습니다.";
+      setVerified(false);
+      setAlert({ type: "error", text: message });
     }
-  }
+  };
 
   const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault()
+    event.preventDefault();
     if (!name.trim()) {
-      setAlert({ type: 'error', text: '이름을 입력해주세요.' })
-      return
+      setAlert({ type: "error", text: "이름을 입력해주세요." });
+      return;
     }
 
-    const normalizedPhone = normalizePhoneNumber(phone)
+    const normalizedPhone = normalizePhoneNumber(phone);
     if (!isValidPhoneNumber(normalizedPhone)) {
-      setAlert({ type: 'error', text: '휴대전화 번호를 정확히 입력해주세요.' })
-      return
+      setAlert({ type: "error", text: "휴대전화 번호를 정확히 입력해주세요." });
+      return;
     }
 
     if (!verified) {
       setAlert({
-        type: 'error',
-        text: '휴대전화 인증을 완료해야 회원가입이 진행됩니다.',
-      })
-      return
+        type: "error",
+        text: "휴대전화 인증을 완료해야 회원가입이 진행됩니다.",
+      });
+      return;
     }
 
-    setSubmitting(true)
+    setSubmitting(true);
     try {
-      const response = await postJson<{ memberId: string; name: string; phone: string; role?: 'master' | 'member' }>(
-        '/api/auth/register',
-        { name: name.trim(), phone: normalizedPhone },
-      )
-      const role = response.role ?? (response.name === 'master' ? 'master' : 'member')
-      register({ name: response.name, phone: response.phone, role })
+      const response = await postJson<{
+        memberId: string;
+        name: string;
+        phone: string;
+        role?: "master" | "member";
+      }>("/auth/register", { name: name.trim(), phone: normalizedPhone });
+      const role =
+        response.role ?? (response.name === "master" ? "master" : "member");
+      register({ name: response.name, phone: response.phone, role });
       setAlert({
-        type: 'success',
-        text: '회원가입이 완료되었습니다. 안내 화면으로 이동합니다.',
-      })
+        type: "success",
+        text: "회원가입이 완료되었습니다. 안내 화면으로 이동합니다.",
+      });
 
       setTimeout(() => {
-        navigate('/')
-      }, 1000)
+        navigate("/");
+      }, 1000);
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : '회원가입 중 문제가 발생했습니다. 다시 시도해주세요.'
-      setAlert({ type: 'error', text: message })
+        error instanceof Error
+          ? error.message
+          : "회원가입 중 문제가 발생했습니다. 다시 시도해주세요.";
+      setAlert({ type: "error", text: message });
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
 
   return (
     <div className={styles.page}>
@@ -143,7 +157,9 @@ export const SignupPage = () => {
           <p
             role="status"
             className={`${styles.message} ${
-              alert.type === 'success' ? styles.messageSuccess : styles.messageError
+              alert.type === "success"
+                ? styles.messageSuccess
+                : styles.messageError
             }`}
           >
             {alert.text}
@@ -170,9 +186,9 @@ export const SignupPage = () => {
               type="tel"
               value={phone}
               onChange={(event) => {
-                const digitsOnly = event.target.value.replace(/\D/g, '')
-                setPhone(digitsOnly)
-                resetVerificationState()
+                const digitsOnly = event.target.value.replace(/\D/g, "");
+                setPhone(digitsOnly);
+                resetVerificationState();
               }}
               placeholder="예) 01012345678"
               autoComplete="tel-national"
@@ -180,7 +196,8 @@ export const SignupPage = () => {
               inputMode="numeric"
             />
             <p className={`${styles.helper} ${styles.helperNotice}`}>
-              하이픈(-) 없이 숫자만 입력해 주세요. 예) <strong>01012345678</strong>
+              하이픈(-) 없이 숫자만 입력해 주세요. 예){" "}
+              <strong>01012345678</strong>
             </p>
           </label>
 
@@ -218,11 +235,17 @@ export const SignupPage = () => {
               인증번호 확인
             </button>
             {verified && (
-              <span className={`${styles.helper} ${styles.codePreview}`}>인증 완료</span>
+              <span className={`${styles.helper} ${styles.codePreview}`}>
+                인증 완료
+              </span>
             )}
           </div>
 
-          <button type="submit" className={styles.button} disabled={isSubmitting || !verified}>
+          <button
+            type="submit"
+            className={styles.button}
+            disabled={isSubmitting || !verified}
+          >
             회원가입 완료
           </button>
         </form>
@@ -235,7 +258,7 @@ export const SignupPage = () => {
         </p>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SignupPage
+export default SignupPage;

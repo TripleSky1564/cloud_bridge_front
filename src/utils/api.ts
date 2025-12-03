@@ -3,43 +3,50 @@
  * BASE_URL은 Vite 환경 변수(VITE_API_BASE_URL)로 주입받고,
  * 값이 없으면 개발 환경 기본값(127.0.0.1:8081; Spring Boot 서버)을 사용합니다.
  */
-import { MOCK_OFFICES, type OfficeRecord } from '../data/offices'
+import { MOCK_OFFICES, type OfficeRecord } from "../data/offices";
 
 const normalizeBase = (value?: string) => {
-  if (!value) return ''
-  const trimmed = value.trim()
-  if (!trimmed) return ''
-  return trimmed.replace(/\/+$/, '')
-}
+  if (!value) return "";
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  return trimmed.replace(/\/+$/, "");
+};
 
 const detectDefaultBase = () => {
   if (import.meta.env.DEV) {
-    return 'http://127.0.0.1:8081'
+    return "http://127.0.0.1:8081";
   }
-  if (typeof window !== 'undefined' && window.location?.origin) {
-    return window.location.origin
+  if (typeof window !== "undefined" && window.location?.origin) {
+    return window.location.origin;
   }
-  return ''
-}
+  return "";
+};
 
-const DEFAULT_BASE_URL = detectDefaultBase()
+const DEFAULT_BASE_URL = detectDefaultBase();
 const BASE_URL =
   normalizeBase(import.meta.env.VITE_API_BASE_URL) ||
   normalizeBase(import.meta.env.VITE_BACKEND_ORIGIN) ||
-  DEFAULT_BASE_URL
+  DEFAULT_BASE_URL;
 
 const ENABLE_OFFLINE_MOCK =
-  (import.meta.env.VITE_ENABLE_OFFLINE_MOCK ?? '').toString().toLowerCase() === 'true'
+  (import.meta.env.VITE_ENABLE_OFFLINE_MOCK ?? "").toString().toLowerCase() ===
+  "true";
 
 const resolvePath = (path: string) => {
-  const normalizedPath = path.startsWith('/') ? path : `/${path}`
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
   if (!BASE_URL) {
-    return normalizedPath
+    return normalizedPath;
   }
-  return `${BASE_URL}${normalizedPath}`
-}
+  return `${BASE_URL}${normalizedPath}`;
+};
 
-type JsonValue = Record<string, unknown> | JsonValue[] | string | number | boolean | null;
+type JsonValue =
+  | Record<string, unknown>
+  | JsonValue[]
+  | string
+  | number
+  | boolean
+  | null;
 
 /**
  * POST 요청을 JSON 형식으로 전송합니다.
@@ -48,14 +55,14 @@ type JsonValue = Record<string, unknown> | JsonValue[] | string | number | boole
  */
 export async function postJson<TResponse>(
   path: string,
-  body: Record<string, unknown>,
+  body: Record<string, unknown>
 ): Promise<TResponse> {
-  const requestUrl = resolvePath(path)
+  const requestUrl = resolvePath(path);
   const response = await fetch(requestUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
-    credentials: 'include',
+    credentials: "include",
   });
 
   if (response.ok) {
@@ -67,7 +74,7 @@ export async function postJson<TResponse>(
   let message = response.statusText;
   try {
     const errorBody = (await response.json()) as { message?: JsonValue };
-    if (errorBody?.message && typeof errorBody.message === 'string') {
+    if (errorBody?.message && typeof errorBody.message === "string") {
       message = errorBody.message;
     }
   } catch {
@@ -82,83 +89,96 @@ export async function postJson<TResponse>(
  */
 export async function getJson<TResponse>(
   path: string,
-  params?: Record<string, string | number | boolean | undefined>,
+  params?: Record<string, string | number | boolean | undefined>
 ): Promise<TResponse> {
-  const normalizedPath = path.startsWith('/') ? path : `/${path}`
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
   const query = params
     ? Object.entries(params)
         .filter(([, value]) => value !== undefined && value !== null)
         .map(
           ([key, value]) =>
-            `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`,
+            `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`
         )
-        .join('&')
-    : ''
-  const baseUrl = resolvePath(normalizedPath)
-  const url = query ? `${baseUrl}?${query}` : baseUrl
+        .join("&")
+    : "";
+  const baseUrl = resolvePath(normalizedPath);
+  const url = query ? `${baseUrl}?${query}` : baseUrl;
 
   try {
-    const response = await fetch(url, { credentials: 'include' })
+    const response = await fetch(url, { credentials: "include" });
     if (!response.ok) {
-      throw new Error(response.statusText || '요청에 실패했습니다.')
+      throw new Error(response.statusText || "요청에 실패했습니다.");
     }
-    return (await response.json()) as TResponse
+    return (await response.json()) as TResponse;
   } catch (error) {
     if (ENABLE_OFFLINE_MOCK) {
-      const offline = getOfflineResponse(normalizedPath, params)
+      const offline = getOfflineResponse(normalizedPath, params);
       if (offline !== null) {
-        return offline as TResponse
+        return offline as TResponse;
       }
     }
-    throw error
+    throw error;
   }
 }
 
-const haversineDistanceKm = (lat1: number, lng1: number, lat2: number, lng2: number) => {
-  const toRad = (deg: number) => (deg * Math.PI) / 180
-  const R = 6371
-  const dLat = toRad(lat2 - lat1)
-  const dLng = toRad(lng2 - lng1)
+const haversineDistanceKm = (
+  lat1: number,
+  lng1: number,
+  lat2: number,
+  lng2: number
+) => {
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) * Math.sin(dLng / 2)
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-  return R * c
-}
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+};
 
 const getOfflineResponse = (
   pathWithQuery: string,
-  params?: Record<string, string | number | boolean | undefined>,
+  params?: Record<string, string | number | boolean | undefined>
 ): unknown | null => {
-  const [pathname, existingQuery = ''] = pathWithQuery.split('?')
-  const searchParams = new URLSearchParams(existingQuery)
+  const [pathname, existingQuery = ""] = pathWithQuery.split("?");
+  const searchParams = new URLSearchParams(existingQuery);
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
-      if (value === undefined || value === null) return
-      searchParams.set(key, String(value))
-    })
+      if (value === undefined || value === null) return;
+      searchParams.set(key, String(value));
+    });
   }
 
-  if (pathname === '/api/offices') {
-    const regionId = searchParams.get('regionId')
+  if (pathname === "/offices") {
+    const regionId = searchParams.get("regionId");
     if (!regionId) {
-      return [...MOCK_OFFICES]
+      return [...MOCK_OFFICES];
     }
-    return MOCK_OFFICES.filter((office) => office.regionCode === regionId)
+    return MOCK_OFFICES.filter((office) => office.regionCode === regionId);
   }
 
-  if (pathname === '/api/offices/nearby') {
-    const lat = Number(searchParams.get('lat'))
-    const lng = Number(searchParams.get('lng'))
-    const radiusKm = Number(searchParams.get('radiusKm')) || 5
+  if (pathname === "/offices/nearby") {
+    const lat = Number(searchParams.get("lat"));
+    const lng = Number(searchParams.get("lng"));
+    const radiusKm = Number(searchParams.get("radiusKm")) || 5;
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-      return [...MOCK_OFFICES]
+      return [...MOCK_OFFICES];
     }
     return MOCK_OFFICES.filter((office: OfficeRecord) => {
-      const distance = haversineDistanceKm(lat, lng, office.latitude, office.longitude)
-      return distance <= radiusKm
-    })
+      const distance = haversineDistanceKm(
+        lat,
+        lng,
+        office.latitude,
+        office.longitude
+      );
+      return distance <= radiusKm;
+    });
   }
 
-  return null
-}
+  return null;
+};

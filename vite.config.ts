@@ -13,7 +13,7 @@ const buildProxyConfig = () => {
     }
   > = {
     '/api/chatbot': {
-      target: 'http://49.50.138.5:9500',
+      target: 'https://project-LoadBalancer-114475867-c668f1c2225a.kr.lb.naverncp.com',
       changeOrigin: true,
       rewrite: (path) => path.replace(/^\/api\/chatbot/, '/stream-chat'),
     },

@@ -149,7 +149,7 @@ const persistCaseUpdate = async (input: CaseUpdateInput) => {
   }
 
   const response = await postJson<MyCaseApiResponse>(
-    `/api/cases?memberId=${encodeURIComponent(input.memberId)}`,
+    `/cases?memberId=${encodeURIComponent(input.memberId)}`,
     payload,
   )
 
@@ -168,7 +168,7 @@ export const refreshCases = async (memberId?: string | null) => {
     resetCaseStore()
     return []
   }
-  const response = await getJson<MyCaseApiResponse[]>('/api/cases', { memberId })
+  const response = await getJson<MyCaseApiResponse[]>('/cases', { memberId })
   const entries = response.map((record) => mapResponseToEntry(record))
   setCaseStore(memberId, entries)
   return entries

@@ -52,7 +52,7 @@ export const LoginPage = () => {
     try {
       setRequestingCode(true)
       const response = await postJson<{ message: string; demoCode?: string }>(
-        '/api/auth/phone/request',
+        '/auth/phone/request',
         { name: trimmedName, phone: normalizedPhone },
       )
       setIssuedCode('requested')
@@ -80,7 +80,7 @@ export const LoginPage = () => {
     }
 
     try {
-      await postJson<{ message: string }>('/api/auth/phone/verify', {
+      await postJson<{ message: string }>('/auth/phone/verify', {
         phone: normalizePhoneNumber(phone),
         code: inputCode.trim(),
       })
@@ -116,7 +116,7 @@ export const LoginPage = () => {
     setSubmitting(true)
     try {
       const response = await postJson<{ memberId: string; name: string; phone: string; role?: 'master' | 'member' }>(
-        '/api/auth/login',
+        '/auth/login',
         { name: trimmedName, phone: normalizedPhone },
       )
       const role = response.role ?? (response.name === 'master' ? 'master' : 'member')
